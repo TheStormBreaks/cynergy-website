@@ -43,29 +43,47 @@ const EventsContext = createContext<EventsContextType | undefined>(undefined);
 
 // Create the provider component
 export const EventsProvider = ({ children }: { children: ReactNode }) => {
-  const [allEvents, setAllEvents] = useState<Event[]>(mockEvents);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [registeredEvents, setRegisteredEvents] = useState<Registration[]>([]);
   const [registrations, setRegistrations] = useState<AllRegistrations>({});
 
-
+  // Load initial data from localStorage on mount
   useEffect(() => {
+    const storedEvents = localStorage.getItem('allEvents');
+    if (storedEvents) {
+      setAllEvents(JSON.parse(storedEvents));
+    } else {
+      setAllEvents(mockEvents); // Fallback to mock data if nothing is stored
+    }
+    
     const storedStudentRegs = localStorage.getItem('registeredEvents');
     if (storedStudentRegs) {
         setRegisteredEvents(JSON.parse(storedStudentRegs));
     }
+    
     const storedAllRegs = localStorage.getItem('allRegistrations');
     if(storedAllRegs) {
         setRegistrations(JSON.parse(storedAllRegs));
     }
   }, []);
 
-  const updateStudentLocalStorage = (regs: Registration[]) => {
-      localStorage.setItem('registeredEvents', JSON.stringify(regs));
-  };
-  
-  const updateAllRegistrationsLocalStorage = (regs: AllRegistrations) => {
-    localStorage.setItem('allRegistrations', JSON.stringify(regs));
-  }
+  // Persist allEvents to localStorage
+  useEffect(() => {
+    if (allEvents.length > 0) { // Only save if there's something to save
+        localStorage.setItem('allEvents', JSON.stringify(allEvents));
+    }
+  }, [allEvents]);
+
+  // Persist registeredEvents to localStorage
+  useEffect(() => {
+    localStorage.setItem('registeredEvents', JSON.stringify(registeredEvents));
+  }, [registeredEvents]);
+
+  // Persist registrations to localStorage
+  useEffect(() => {
+    localStorage.setItem('allRegistrations', JSON.stringify(registrations));
+  }, [registrations]);
+
 
   const addEvent = (event: Event) => {
     setAllEvents((prevEvents) => [event, ...prevEvents]);
@@ -79,7 +97,6 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       // Update student's personal registration list
       setRegisteredEvents(prev => {
           const newRegs = [...prev, { eventId, feedbackSubmitted: false }];
-          updateStudentLocalStorage(newRegs);
           return newRegs;
       });
 
@@ -87,7 +104,6 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       setRegistrations(prev => {
           const updatedEventRegistrations = [...(prev[eventId] || []), formData];
           const newAllRegs = { ...prev, [eventId]: updatedEventRegistrations };
-          updateAllRegistrationsLocalStorage(newAllRegs);
           return newAllRegs;
       });
   };
