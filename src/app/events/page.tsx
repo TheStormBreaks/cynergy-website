@@ -2,7 +2,7 @@
 
 import { EventCard } from "@/components/event-card";
 import { Button } from "@/components/ui/button";
-import { events } from "@/lib/mock-data";
+import { useEvents } from "@/contexts/events-context";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
@@ -10,8 +10,9 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 export default function EventsPage() {
-  const upcomingEvents = events.filter((e) => e.status === 'upcoming');
-  const pastEvents = events.filter((e) => e.status === 'completed');
+  const { allEvents } = useEvents();
+  const upcomingEvents = allEvents.filter((e) => e.status === 'upcoming');
+  const pastEvents = allEvents.filter((e) => e.status === 'completed');
 
   const { userRole } = useAuth();
   const router = useRouter();
@@ -47,6 +48,7 @@ export default function EventsPage() {
         {upcomingEvents.map((event) => (
           <EventCard key={event.id} {...event} />
         ))}
+        {upcomingEvents.length === 0 && <p className="text-muted-foreground col-span-full">No upcoming events. Check back soon!</p>}
       </div>
 
       <h2 className="font-headline text-3xl md:text-4xl font-bold mt-16 mb-8 border-t pt-8">
@@ -56,6 +58,7 @@ export default function EventsPage() {
         {pastEvents.map((event) => (
           <EventCard key={event.id} {...event} />
         ))}
+         {pastEvents.length === 0 && <p className="text-muted-foreground col-span-full">No past events yet.</p>}
       </div>
     </div>
   );

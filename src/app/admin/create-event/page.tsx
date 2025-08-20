@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,15 +19,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { generatePosterAction, generateReportAction } from "./actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useEvents } from "@/contexts/events-context";
 
 const formFields = [
-  { id: "name", label: "Name" },
+  { id: "name", label: "Name", required: true },
+  { id: "email", label: "Email", required: true },
   { id: "number", label: "Phone Number" },
   { id: "class", label: "Class/Year" },
   { id: "regNo", label: "Registration No." },
   { id: "branch", label: "Branch" },
   { id: "batch", label: "Batch" },
-  { id: "email", label: "Email" },
 ];
 
 const fakeRegistrations = [
@@ -37,12 +39,46 @@ const fakeRegistrations = [
 
 export default function CreateEventPage() {
     const { toast } = useToast();
+    const { addEvent } = useEvents();
     const [posterLoading, setPosterLoading] = useState(false);
     const [reportLoading, setReportLoading] = useState(false);
     const [posterUri, setPosterUri] = useState<string | null>(null);
     const [report, setReport] = useState<string | null>(null);
     const [posterDescription, setPosterDescription] = useState("");
+    const [eventName, setEventName] = useState("");
+    const [eventDescription, setEventDescription] = useState("");
+    const [selectedFields, setSelectedFields] = useState<string[]>(['name', 'email']);
+
+    const handleFieldToggle = (fieldId: string) => {
+        setSelectedFields(prev => 
+            prev.includes(fieldId) 
+                ? prev.filter(id => id !== fieldId)
+                : [...prev, fieldId]
+        );
+    };
     
+    const handleCreateEvent = () => {
+        if (!eventName || !eventDescription) {
+            toast({ title: "Error", description: "Please provide an event name and description.", variant: "destructive" });
+            return;
+        }
+
+        const newEvent = {
+            id: `event-${Date.now()}`,
+            name: eventName,
+            description: eventDescription,
+            date: new Date().toISOString(),
+            status: 'upcoming' as 'upcoming' | 'completed',
+            formFields: selectedFields,
+        };
+
+        addEvent(newEvent);
+        toast({ title: "Event Created!", description: `${eventName} is now live.` });
+        setEventName("");
+        setEventDescription("");
+        setSelectedFields(['name', 'email']);
+    };
+
     const handleGeneratePoster = async () => {
         if (!posterDescription) {
             toast({ title: "Error", description: "Please enter an event description for the poster.", variant: "destructive" });
@@ -94,19 +130,28 @@ export default function CreateEventPage() {
             <CardHeader>
               <CardTitle>Event Details & Registration Form</CardTitle>
               <CardDescription>
-                Select the fields to include in the student registration form.
+                Define your event and select the fields for student registration.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="eventName">Event Name</Label>
-                    <Input id="eventName" placeholder="e.g., Annual Hackathon" />
+                    <Input id="eventName" placeholder="e.g., Annual Hackathon" value={eventName} onChange={e => setEventName(e.target.value)} />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="eventDescription">Event Description</Label>
+                    <Textarea id="eventDescription" placeholder="Describe what the event is about." value={eventDescription} onChange={e => setEventDescription(e.target.value)} />
                 </div>
               <Label>Registration Form Fields</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 rounded-lg border p-4">
                 {formFields.map((field) => (
                   <div key={field.id} className="flex items-center space-x-2">
-                    <Checkbox id={field.id} />
+                    <Checkbox 
+                        id={field.id}
+                        checked={selectedFields.includes(field.id)}
+                        onCheckedChange={() => handleFieldToggle(field.id)}
+                        disabled={field.required}
+                    />
                     <Label htmlFor={field.id} className="font-normal">
                       {field.label}
                     </Label>
@@ -114,6 +159,9 @@ export default function CreateEventPage() {
                 ))}
               </div>
             </CardContent>
+            <CardFooter>
+                <Button onClick={handleCreateEvent}>Create Event</Button>
+            </CardFooter>
           </Card>
 
           <Card>

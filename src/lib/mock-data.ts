@@ -20,10 +20,10 @@ export const studentMembers = [
 ];
 
 export const events = [
-  { id: '1', name: 'Hackathon 2024', description: 'A 24-hour coding competition.', date: '2024-10-26', status: 'upcoming' },
-  { id: '2', name: 'Intro to Web Dev', description: 'A workshop on the basics of web development.', date: '2024-09-15', status: 'upcoming' },
-  { id: '3', name: 'AI/ML Bootcamp', description: 'An intensive bootcamp on machine learning.', date: '2024-08-20', status: 'completed' },
-  { id: '4', name: 'Cyber Security Summit', description: 'Talks from industry experts on cyber security.', date: '2024-07-11', status: 'completed' },
+  { id: '1', name: 'Hackathon 2024', description: 'A 24-hour coding competition.', date: '2024-10-26', status: 'upcoming', formFields: ['name', 'email', 'regNo', 'branch'] },
+  { id: '2', name: 'Intro to Web Dev', description: 'A workshop on the basics of web development.', date: '2024-09-15', status: 'upcoming', formFields: ['name', 'email', 'class'] },
+  { id: '3', name: 'AI/ML Bootcamp', description: 'An intensive bootcamp on machine learning.', date: '2024-08-20', status: 'completed', formFields: ['name', 'email'] },
+  { id: '4', name: 'Cyber Security Summit', description: 'Talks from industry experts on cyber security.', date: '2024-07-11', status: 'completed', formFields: ['name', 'email', 'regNo'] },
 ];
 
 export const projects = [

@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/providers/theme-provider';
 import Header from '@/components/layout/header';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/auth-context';
+import { EventsProvider } from '@/contexts/events-context';
 
 export const metadata: Metadata = {
   title: 'CodePulse',
@@ -25,11 +26,13 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
         <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Toaster />
-          </ThemeProvider>
+          <EventsProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Toaster />
+            </ThemeProvider>
+          </EventsProvider>
         </AuthProvider>
       </body>
     </html>
