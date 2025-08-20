@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Instagram, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import TeamSection from "@/components/team-section";
+import ProjectsSection from "@/components/projects-section";
+
 
 export default function Home() {
   const bannerText = " *code / create / conquer ---------";
@@ -33,6 +36,9 @@ export default function Home() {
            </div>
         </div>
       </section>
+
+      <TeamSection />
+      <ProjectsSection />
 
       <section className="pt-16">
         <Card className="bg-card/80 backdrop-blur-sm">
