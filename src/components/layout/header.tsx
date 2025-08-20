@@ -42,13 +42,13 @@ export default function Header() {
           ))}
            {userRole === 'faculty' && (
              <Link
-              href="/admin/create-event"
+              href="/admin/events"
               className={cn(
                 "transition-colors hover:text-primary",
-                pathname === "/admin/create-event" ? "text-primary" : "text-foreground/60"
+                pathname.startsWith("/admin") ? "text-primary" : "text-foreground/60"
               )}
             >
-              &lt;Create Event/&gt;
+              &lt;Admin Dashboard/&gt;
             </Link>
            )}
            {userRole === 'student' && (

@@ -20,7 +20,7 @@ export default function EventsPage() {
 
   const handleCreateEventClick = () => {
     if (userRole === 'faculty') {
-      router.push('/admin/create-event');
+      router.push('/admin/events');
     } else if (userRole === 'student') {
       toast({
         title: "Access Denied",
@@ -38,10 +38,12 @@ export default function EventsPage() {
         <h1 className="font-headline text-4xl md:text-5xl font-bold">
           Upcoming Events
         </h1>
-        <Button onClick={handleCreateEventClick}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create Event
-        </Button>
+        { userRole === 'faculty' && (
+          <Button onClick={handleCreateEventClick}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create & Manage Events
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -28,7 +28,7 @@ export default function LoginPage() {
     if (email === "faculty" && password === "faculty") {
       login("faculty");
       toast({ title: "Login Successful", description: "Welcome, faculty member." });
-      router.push("/admin/create-event");
+      router.push("/admin/events");
     } else if (email === "student" && password === "student") {
       login("student");
       toast({ title: "Login Successful", description: "Welcome, student." });

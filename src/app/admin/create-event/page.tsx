@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -15,11 +16,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { generatePosterAction, generateReportAction } from "./actions";
+import { generatePosterAction } from "./actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useEvents } from "@/contexts/events-context";
+import { useRouter } from "next/navigation";
 
 const formFields = [
   { id: "name", label: "Name", required: true },
@@ -31,19 +32,12 @@ const formFields = [
   { id: "batch", label: "Batch" },
 ];
 
-const fakeRegistrations = [
-    { id: 1, name: "Peter Parker", email: "p.parker@test.com", regNo: "123" },
-    { id: 2, name: "Gwen Stacy", email: "g.stacy@test.com", regNo: "124" },
-    { id: 3, name: "Miles Morales", email: "m.morales@test.com", regNo: "125" },
-];
-
 export default function CreateEventPage() {
     const { toast } = useToast();
+    const router = useRouter();
     const { addEvent } = useEvents();
     const [posterLoading, setPosterLoading] = useState(false);
-    const [reportLoading, setReportLoading] = useState(false);
     const [posterUri, setPosterUri] = useState<string | null>(null);
-    const [report, setReport] = useState<string | null>(null);
     const [posterDescription, setPosterDescription] = useState("");
     const [eventName, setEventName] = useState("");
     const [eventDescription, setEventDescription] = useState("");
@@ -74,9 +68,7 @@ export default function CreateEventPage() {
 
         addEvent(newEvent);
         toast({ title: "Event Created!", description: `${eventName} is now live.` });
-        setEventName("");
-        setEventDescription("");
-        setSelectedFields(['name', 'email']);
+        router.push("/admin/events");
     };
 
     const handleGeneratePoster = async () => {
@@ -96,23 +88,6 @@ export default function CreateEventPage() {
         setPosterLoading(false);
     };
 
-    const handleGenerateReport = async () => {
-        setReportLoading(true);
-        setReport(null);
-        const result = await generateReportAction({
-            eventName: "Hackathon 2024",
-            feedbackSummary: "Overall positive, but some requested more snacks.",
-            participationSummary: "125 students registered, 110 attended.",
-        });
-        if (result.error) {
-            toast({ title: "Report Generation Failed", description: result.error, variant: "destructive" });
-        } else if (result.report) {
-            setReport(result.report);
-            toast({ title: "Report Generated!", description: "The event summary report is ready." });
-        }
-        setReportLoading(false);
-    }
-
   return (
     <div className="container mx-auto px-4 py-12 space-y-8">
       <div>
@@ -120,7 +95,7 @@ export default function CreateEventPage() {
           Create New Event
         </h1>
         <p className="text-muted-foreground">
-          Manage event details, registrations, and assets.
+          Fill in the details for your new event.
         </p>
       </div>
 
@@ -163,7 +138,8 @@ export default function CreateEventPage() {
                 <Button onClick={handleCreateEvent}>Create Event</Button>
             </CardFooter>
           </Card>
-
+        </div>
+        <div className="lg:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle>AI Poster Generator</CardTitle>
@@ -187,60 +163,6 @@ export default function CreateEventPage() {
                     <Image src={posterUri} width={512} height={512} alt="Generated Event Poster" className="rounded-md" />
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-                <CardTitle>Post-Event Actions</CardTitle>
-                <CardDescription>
-                    Manage feedback forms and generate event reports after the event concludes.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-4">
-                    <Button variant="outline">Open Feedback Form</Button>
-                    <Button onClick={handleGenerateReport} disabled={reportLoading}>
-                        {reportLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Create Report
-                    </Button>
-                </div>
-                {report && (
-                    <div className="mt-4 border rounded-lg p-4 bg-muted/50">
-                        <h3 className="font-semibold mb-2">Generated Report:</h3>
-                        <p className="text-sm whitespace-pre-wrap">{report}</p>
-                    </div>
-                )}
-            </CardContent>
-          </Card>
-
-        </div>
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Registrations</CardTitle>
-              <CardDescription>
-                {fakeRegistrations.length} students have registered so far.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Button variant="secondary" className="w-full mb-4">Export to Excel</Button>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Reg No.</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {fakeRegistrations.map(reg => (
-                    <TableRow key={reg.id}>
-                      <TableCell>{reg.name}</TableCell>
-                      <TableCell>{reg.regNo}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
             </CardContent>
           </Card>
         </div>
