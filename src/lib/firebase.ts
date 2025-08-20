@@ -3,8 +3,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
-// IMPORTANT: This is a public-facing configuration object.
-// Do not add any secret keys or sensitive information to this file.
+// IMPORTANT: Paste your configuration object from the Firebase Console here.
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_AUTH_DOMAIN",
