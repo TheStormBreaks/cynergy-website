@@ -1,6 +1,8 @@
+
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
+import { useEvents } from "@/contexts/events-context";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +16,7 @@ import { Badge } from "./ui/badge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { CheckCircle } from "lucide-react";
 
 interface EventCardProps {
   id: string;
@@ -25,11 +28,15 @@ interface EventCardProps {
 
 export function EventCard({ id, name, description, date, status }: EventCardProps) {
   const { userRole } = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter();
+  const { registerForEvent, isRegistered } = useEvents();
+
+  const isAlreadyRegistered = isRegistered(id);
 
   const handleRegisterClick = () => {
     if (userRole === 'student') {
+        registerForEvent(id);
         toast({ title: "Registration Successful!", description: `You have registered for ${name}.` });
         router.push('/dashboard');
     } else if (userRole === 'faculty') {
@@ -53,12 +60,19 @@ export function EventCard({ id, name, description, date, status }: EventCardProp
       </CardContent>
       <CardFooter>
         {status === "upcoming" ? (
-          <Button onClick={handleRegisterClick} className="w-full">
-            Register Now
+          <Button onClick={handleRegisterClick} className="w-full" disabled={isAlreadyRegistered}>
+            {isAlreadyRegistered ? (
+              <>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Registered
+              </>
+            ) : (
+              'Register Now'
+            )}
           </Button>
         ) : (
           <Button asChild variant="outline" className="w-full">
-            <Link href="/dashboard">Fill Feedback & Get Certificate</Link>
+            <Link href="/dashboard">View Status</Link>
           </Button>
         )}
       </CardFooter>
