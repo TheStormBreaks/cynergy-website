@@ -40,6 +40,7 @@ export function EventRegistrationsDialog({
 }: EventRegistrationsDialogProps) {
   const { registrations } = useEvents();
   const eventRegistrations = registrations[eventId] || [];
+  const displayFields = ['studentId', ...formFields];
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -57,7 +58,7 @@ export function EventRegistrationsDialog({
             <Table>
               <TableHeader className="sticky top-0 bg-background">
                 <TableRow>
-                  {formFields.map((field) => (
+                  {displayFields.map((field) => (
                     <TableHead key={field}>{formatLabel(field)}</TableHead>
                   ))}
                 </TableRow>
@@ -65,7 +66,7 @@ export function EventRegistrationsDialog({
               <TableBody>
                 {eventRegistrations.map((registrationData, index) => (
                   <TableRow key={index}>
-                    {formFields.map((field) => (
+                    {displayFields.map((field) => (
                       <TableCell key={field}>
                         {registrationData[field] || 'N/A'}
                       </TableCell>

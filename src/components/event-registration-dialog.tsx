@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface EventRegistrationDialogProps {
   isOpen: boolean;
@@ -34,15 +35,15 @@ export function EventRegistrationDialog({
   const { toast } = useToast();
   const { registerForEvent } = useEvents();
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Basic validation
     for (const field of formFields) {
-        // Simple check if required fields are filled, can be made more robust
         if (field === 'name' || field === 'email') {
             if (!formData[field]) {
                  toast({
@@ -54,13 +55,25 @@ export function EventRegistrationDialog({
             }
         }
     }
+    
+    setLoading(true);
+    try {
+      await registerForEvent(eventId, formData);
+      toast({
+        title: "Registration Successful!",
+        description: `You have registered for ${eventName}.`,
+      });
+      onOpenChange(false);
+    } catch(e) {
+        toast({
+            title: "Registration Failed",
+            description: "Could not register for the event. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setLoading(false);
+    }
 
-    registerForEvent(eventId, formData);
-    toast({
-      title: "Registration Successful!",
-      description: `You have registered for ${eventName}.`,
-    });
-    onOpenChange(false);
   };
 
   // A helper to format the field ID into a readable label
@@ -95,7 +108,10 @@ export function EventRegistrationDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Submit Registration</Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Submit Registration
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

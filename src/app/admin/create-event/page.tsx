@@ -37,6 +37,7 @@ export default function CreateEventPage() {
     const router = useRouter();
     const { addEvent } = useEvents();
     const [posterLoading, setPosterLoading] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
     const [posterUri, setPosterUri] = useState<string | null>(null);
     const [posterDescription, setPosterDescription] = useState("");
     const [eventName, setEventName] = useState("");
@@ -51,14 +52,13 @@ export default function CreateEventPage() {
         );
     };
     
-    const handleCreateEvent = () => {
+    const handleCreateEvent = async () => {
         if (!eventName || !eventDescription) {
             toast({ title: "Error", description: "Please provide an event name and description.", variant: "destructive" });
             return;
         }
 
         const newEvent = {
-            id: `event-${Date.now()}`,
             name: eventName,
             description: eventDescription,
             date: new Date().toISOString(),
@@ -66,9 +66,16 @@ export default function CreateEventPage() {
             formFields: selectedFields,
         };
 
-        addEvent(newEvent);
-        toast({ title: "Event Created!", description: `${eventName} is now live.` });
-        router.push("/admin/events");
+        setCreateLoading(true);
+        try {
+            await addEvent(newEvent);
+            toast({ title: "Event Created!", description: `${eventName} is now live.` });
+            router.push("/admin/events");
+        } catch (error) {
+            toast({ title: "Error", description: "Could not create event. Please try again.", variant: "destructive" });
+        } finally {
+            setCreateLoading(false);
+        }
     };
 
     const handleGeneratePoster = async () => {
@@ -135,7 +142,10 @@ export default function CreateEventPage() {
               </div>
             </CardContent>
             <CardFooter>
-                <Button onClick={handleCreateEvent}>Create Event</Button>
+                <Button onClick={handleCreateEvent} disabled={createLoading}>
+                    {createLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Create Event
+                </Button>
             </CardFooter>
           </Card>
         </div>
@@ -146,7 +156,7 @@ export default function CreateEventPage() {
               <CardDescription>
                 Describe the event, and our AI will create a poster for you.
               </CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent className="space-y-4">
                 <Textarea 
                     placeholder="e.g., A futuristic hackathon about AI, with glowing circuits and a cityscape."

@@ -10,22 +10,19 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userRole } = useAuth();
+  const { userRole, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // If auth state is loaded and user is not faculty, redirect
-    if (userRole && userRole !== 'faculty') {
-      router.push('/login');
+    if (!loading) {
+        if (userRole !== 'faculty') {
+            router.push('/login');
+        }
     }
-    // If auth state is not loaded (e.g. page refresh) and there's no role, redirect
-    if (userRole === null) {
-        router.push('/login');
-    }
-  }, [userRole, router]);
+  }, [userRole, loading, router]);
 
   // While checking auth, show a loader
-  if (userRole !== 'faculty') {
+  if (loading || userRole !== 'faculty') {
     return (
       <div className="flex justify-center items-center h-[80vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
