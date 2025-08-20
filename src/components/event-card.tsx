@@ -1,3 +1,6 @@
+"use client";
+
+import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 interface EventCardProps {
   id: string;
@@ -19,6 +24,21 @@ interface EventCardProps {
 }
 
 export function EventCard({ id, name, description, date, status }: EventCardProps) {
+  const { userRole } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleRegisterClick = () => {
+    if (userRole === 'student') {
+        toast({ title: "Registration Successful!", description: `You have registered for ${name}.` });
+        router.push('/dashboard');
+    } else if (userRole === 'faculty') {
+        toast({ title: "Action not available", description: "Faculty members cannot register for events." });
+    } else {
+        router.push('/login');
+    }
+  };
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -33,8 +53,8 @@ export function EventCard({ id, name, description, date, status }: EventCardProp
       </CardContent>
       <CardFooter>
         {status === "upcoming" ? (
-          <Button asChild className="w-full">
-            <Link href="/login">Register Now</Link>
+          <Button onClick={handleRegisterClick} className="w-full">
+            Register Now
           </Button>
         ) : (
           <Button asChild variant="outline" className="w-full">

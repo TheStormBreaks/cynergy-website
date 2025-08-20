@@ -1,12 +1,35 @@
+"use client";
+
 import { EventCard } from "@/components/event-card";
 import { Button } from "@/components/ui/button";
 import { events } from "@/lib/mock-data";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/auth-context";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function EventsPage() {
   const upcomingEvents = events.filter((e) => e.status === 'upcoming');
   const pastEvents = events.filter((e) => e.status === 'completed');
+
+  const { userRole } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleCreateEventClick = () => {
+    if (userRole === 'faculty') {
+      router.push('/admin/create-event');
+    } else if (userRole === 'student') {
+      toast({
+        title: "Access Denied",
+        description: "Only faculty members can create events.",
+        variant: "destructive"
+      });
+    } else {
+      router.push('/login');
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -14,11 +37,9 @@ export default function EventsPage() {
         <h1 className="font-headline text-4xl md:text-5xl font-bold">
           Upcoming Events
         </h1>
-        <Button asChild>
-          <Link href="/admin/create-event">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create Event
-          </Link>
+        <Button onClick={handleCreateEventClick}>
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Create Event
         </Button>
       </div>
 
