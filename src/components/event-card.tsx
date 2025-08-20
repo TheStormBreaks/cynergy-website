@@ -17,6 +17,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle } from "lucide-react";
+import { useState } from "react";
+import { EventRegistrationDialog } from "./event-registration-dialog";
 
 interface EventCardProps {
   id: string;
@@ -24,21 +26,21 @@ interface EventCardProps {
   description: string;
   date: string;
   status: "upcoming" | "completed";
+  formFields?: string[];
 }
 
-export function EventCard({ id, name, description, date, status }: EventCardProps) {
+export function EventCard({ id, name, description, date, status, formFields }: EventCardProps) {
   const { userRole } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const { registerForEvent, isRegistered } = useEvents();
+  const { isRegistered } = useEvents();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const isAlreadyRegistered = isRegistered(id);
 
   const handleRegisterClick = () => {
     if (userRole === 'student') {
-        registerForEvent(id);
-        toast({ title: "Registration Successful!", description: `You have registered for ${name}.` });
-        router.push('/dashboard');
+        setIsDialogOpen(true);
     } else if (userRole === 'faculty') {
         toast({ title: "Action not available", description: "Faculty members cannot register for events." });
     } else {
@@ -47,35 +49,46 @@ export function EventCard({ id, name, description, date, status }: EventCardProp
   };
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-            <CardTitle className="font-headline text-2xl">{name}</CardTitle>
-            <Badge variant={status === 'upcoming' ? 'default' : 'secondary'}>{status}</Badge>
-        </div>
-        <CardDescription>{new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="text-muted-foreground">{description}</p>
-      </CardContent>
-      <CardFooter>
-        {status === "upcoming" ? (
-          <Button onClick={handleRegisterClick} className="w-full" disabled={isAlreadyRegistered}>
-            {isAlreadyRegistered ? (
-              <>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Registered
-              </>
-            ) : (
-              'Register Now'
-            )}
-          </Button>
-        ) : (
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/dashboard">View Status</Link>
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+    <>
+      <Card className="flex flex-col">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+              <CardTitle className="font-headline text-2xl">{name}</CardTitle>
+              <Badge variant={status === 'upcoming' ? 'default' : 'secondary'}>{status}</Badge>
+          </div>
+          <CardDescription>{new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-grow">
+          <p className="text-muted-foreground">{description}</p>
+        </CardContent>
+        <CardFooter>
+          {status === "upcoming" ? (
+            <Button onClick={handleRegisterClick} className="w-full" disabled={isAlreadyRegistered}>
+              {isAlreadyRegistered ? (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Registered
+                </>
+              ) : (
+                'Register Now'
+              )}
+            </Button>
+          ) : (
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/dashboard">View Status</Link>
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+      {formFields && (
+        <EventRegistrationDialog
+            isOpen={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            eventName={name}
+            eventId={id}
+            formFields={formFields}
+        />
+      )}
+    </>
   );
 }

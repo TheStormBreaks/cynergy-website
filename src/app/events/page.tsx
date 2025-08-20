@@ -1,3 +1,4 @@
+
 "use client";
 
 import { EventCard } from "@/components/event-card";
@@ -48,7 +49,7 @@ export default function EventsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {upcomingEvents.map((event) => (
-          <EventCard key={event.id} {...event} />
+          <EventCard key={event.id} {...event} formFields={event.formFields} />
         ))}
         {upcomingEvents.length === 0 && <p className="text-muted-foreground col-span-full">No upcoming events. Check back soon!</p>}
       </div>
@@ -58,7 +59,7 @@ export default function EventsPage() {
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {pastEvents.map((event) => (
-          <EventCard key={event.id} {...event} />
+          <EventCard key={event.id} {...event} formFields={event.formFields} />
         ))}
          {pastEvents.length === 0 && <p className="text-muted-foreground col-span-full">No past events yet.</p>}
       </div>

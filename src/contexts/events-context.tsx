@@ -19,14 +19,23 @@ interface Registration {
     feedbackSubmitted: boolean;
 }
 
+// Type for storing form data for registrations
+type RegistrationData = Record<string, string>;
+type AllRegistrations = Record<string, RegistrationData[]>;
+
 // Define the shape of the context
 interface EventsContextType {
   allEvents: Event[];
   addEvent: (event: Event) => void;
   getEventById: (id: string) => Event | undefined;
+  
+  // Student-specific states
   registeredEvents: Registration[];
-  registerForEvent: (eventId: string) => void;
   isRegistered: (eventId: string) => boolean;
+
+  // Combined registration logic
+  registrations: AllRegistrations;
+  registerForEvent: (eventId: string, formData: RegistrationData) => void;
 }
 
 // Create the context
@@ -36,17 +45,27 @@ const EventsContext = createContext<EventsContextType | undefined>(undefined);
 export const EventsProvider = ({ children }: { children: ReactNode }) => {
   const [allEvents, setAllEvents] = useState<Event[]>(mockEvents);
   const [registeredEvents, setRegisteredEvents] = useState<Registration[]>([]);
+  const [registrations, setRegistrations] = useState<AllRegistrations>({});
+
 
   useEffect(() => {
-    const storedRegistrations = localStorage.getItem('registeredEvents');
-    if (storedRegistrations) {
-        setRegisteredEvents(JSON.parse(storedRegistrations));
+    const storedStudentRegs = localStorage.getItem('registeredEvents');
+    if (storedStudentRegs) {
+        setRegisteredEvents(JSON.parse(storedStudentRegs));
+    }
+    const storedAllRegs = localStorage.getItem('allRegistrations');
+    if(storedAllRegs) {
+        setRegistrations(JSON.parse(storedAllRegs));
     }
   }, []);
 
-  const updateLocalStorage = (regs: Registration[]) => {
+  const updateStudentLocalStorage = (regs: Registration[]) => {
       localStorage.setItem('registeredEvents', JSON.stringify(regs));
   };
+  
+  const updateAllRegistrationsLocalStorage = (regs: AllRegistrations) => {
+    localStorage.setItem('allRegistrations', JSON.stringify(regs));
+  }
 
   const addEvent = (event: Event) => {
     setAllEvents((prevEvents) => [event, ...prevEvents]);
@@ -56,11 +75,20 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       return allEvents.find(event => event.id === id);
   }
 
-  const registerForEvent = (eventId: string) => {
+  const registerForEvent = (eventId: string, formData: RegistrationData) => {
+      // Update student's personal registration list
       setRegisteredEvents(prev => {
           const newRegs = [...prev, { eventId, feedbackSubmitted: false }];
-          updateLocalStorage(newRegs);
+          updateStudentLocalStorage(newRegs);
           return newRegs;
+      });
+
+      // Add the detailed registration data for faculty view
+      setRegistrations(prev => {
+          const updatedEventRegistrations = [...(prev[eventId] || []), formData];
+          const newAllRegs = { ...prev, [eventId]: updatedEventRegistrations };
+          updateAllRegistrationsLocalStorage(newAllRegs);
+          return newAllRegs;
       });
   };
 
@@ -69,7 +97,7 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <EventsContext.Provider value={{ allEvents, addEvent, getEventById, registeredEvents, registerForEvent, isRegistered }}>
+    <EventsContext.Provider value={{ allEvents, addEvent, getEventById, registeredEvents, isRegistered, registrations, registerForEvent }}>
       {children}
     </EventsContext.Provider>
   );
