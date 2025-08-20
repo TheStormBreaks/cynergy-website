@@ -3,14 +3,14 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
-// IMPORTANT: Paste your configuration object from the Firebase Console here.
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyCSyjUsDUI7UnEWEI_2cOtKZ1BvpCq1z4Q",
+  authDomain: "cynergy-website-75db7.firebaseapp.com",
+  projectId: "cynergy-website-75db7",
+  storageBucket: "cynergy-website-75db7.appspot.com",
+  messagingSenderId: "69980776805",
+  appId: "1:69980776805:web:db747823f07753dc07d98c",
+  measurementId: "G-KN6RCQBGZE"
 };
 
 // Initialize Firebase
