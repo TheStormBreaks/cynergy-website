@@ -156,7 +156,7 @@ export default function CreateEventPage() {
               <CardDescription>
                 Describe the event, and our AI will create a poster for you.
               </CardDescription>
-            </Header>
+            </CardHeader>
             <CardContent className="space-y-4">
                 <Textarea 
                     placeholder="e.g., A futuristic hackathon about AI, with glowing circuits and a cityscape."
